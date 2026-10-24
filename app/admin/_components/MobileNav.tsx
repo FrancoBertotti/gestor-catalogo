@@ -5,25 +5,11 @@ import Link from 'next/link'
 import { logout } from '@/app/login/actions'
 
 const navLinks = [
-  { href: '/admin', label: 'Dashboard' },
-  { href: '/admin/products', label: 'Productos' },
-  { href: '/admin/categories', label: 'Categorías' },
-  { href: '/admin/materials', label: 'Materiales' },
+  { href: '/admin', label: 'dashboard' },
+  { href: '/admin/products', label: 'productos' },
+  { href: '/admin/categories', label: 'categorías' },
+  { href: '/admin/materials', label: 'materiales' },
 ]
-
-export function MobileMenuButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="md:hidden rounded-lg p-2 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
-      aria-label="Abrir menú"
-    >
-      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
-  )
-}
 
 export function MobileDrawer() {
   const [open, setOpen] = useState(false)
@@ -31,12 +17,16 @@ export function MobileDrawer() {
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
-        className="md:hidden rounded-lg p-2 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+        onClick={() => setOpen(!open)}
+        className="p-2 text-neutral-300 hover:text-white border border-neutral-800 bg-neutral-950 transition-colors"
         aria-label="Abrir menú"
       >
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {open ? (
+            <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          )}
         </svg>
       </button>
 
@@ -44,21 +34,21 @@ export function MobileDrawer() {
         <>
           {/* Overlay */}
           <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-40 bg-black/70"
             onClick={() => setOpen(false)}
           />
 
           {/* Drawer */}
-          <div className="fixed inset-y-0 left-0 z-50 w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col md:hidden">
-            <div className="flex items-center justify-between p-4 border-b border-zinc-800">
-              <span className="text-lg font-bold text-indigo-400">Gestor Practical</span>
+          <div className="fixed inset-y-0 left-0 z-50 w-64 bg-black border-r border-neutral-800 flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-neutral-800">
+              <span className="text-base font-bold text-[#dc4a1b]">Gestor Practical</span>
               <button
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
+                className="p-1.5 text-neutral-400 hover:text-white border border-neutral-800 transition-colors"
                 aria-label="Cerrar menú"
               >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
@@ -69,20 +59,20 @@ export function MobileDrawer() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-indigo-600/20 hover:text-indigo-300"
+                  className="block px-3 py-2.5 text-sm font-medium text-[#1bacdc] hover:text-[#afe1f1] hover:bg-neutral-900 transition-colors lowercase"
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
 
-            <div className="p-4 border-t border-zinc-800">
+            <div className="p-4 border-t border-neutral-800">
               <form action={logout}>
                 <button
                   type="submit"
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
+                  className="w-full border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-mono uppercase tracking-wider text-neutral-300 hover:border-[#dc4a1b] hover:text-white transition-colors"
                 >
-                  Cerrar Sesión
+                  cerrar sesión
                 </button>
               </form>
             </div>
