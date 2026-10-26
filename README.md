@@ -1,41 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gestor de Catálogo — Practical Thinking
 
-## Getting Started
+Panel de administración para gestionar el catálogo de productos de Practical Thinking. Permite crear, editar y eliminar productos, categorías, subcategorías y materiales, con autenticación protegida vía Supabase.
 
-First, run the development server:
+**Autor:** Franco Bertotti ([@FrancoBertotti](https://github.com/FrancoBertotti))
+
+---
+
+## Stack tecnológico
+
+| Tecnología | Versión | Rol |
+|------------|---------|-----|
+| [Next.js](https://nextjs.org) | 16.x | Framework principal (App Router) |
+| [React](https://react.dev) | 19.x | UI |
+| [Supabase](https://supabase.com) | 2.x | Base de datos y autenticación |
+| [Tailwind CSS](https://tailwindcss.com) | 4.x | Estilos |
+| TypeScript | 5.x | Tipado estático |
+
+---
+
+## Estructura del proyecto
+
+```
+app/
+├── login/               # Página e lógica de autenticación
+├── admin/               # Panel de administración (rutas protegidas)
+│   ├── products/        # CRUD de productos
+│   ├── categories/      # CRUD de categorías y subcategorías
+│   └── materials/       # CRUD de materiales
+└── layout.tsx           # Layout raíz con fuentes y estilos globales
+```
+
+---
+
+## Instalación y desarrollo
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/FrancoBertotti/gestor-catalogo.git
+cd gestor-catalogo
+```
+
+### 2. Instalar dependencias
+
+```bash
+npm install
+```
+
+### 3. Configurar variables de entorno
+
+Crear un archivo `.env.local` en la raíz con las credenciales de Supabase:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_de_supabase
+```
+
+### 4. Levantar el servidor de desarrollo
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrí [http://localhost:3000](http://localhost:3000) en el navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Design System — Practical Thinking
+## Sistema de diseño — Practical Thinking
 
 Copiá este bloque para replicar el estilo en otros sistemas.
 
@@ -123,16 +154,11 @@ className={`${fontPrincipal.variable} ${fontSecundaria.variable} antialiased bg-
 
 ---
 
-## Getting Started
+### Despliegue
 
-First, run the development server:
+Se realizó con Vercel por medio de GithHub, conectado a Supabase para la gestion de la base de datos.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+link: https://gestor-catalogo.vercel.app/login
+
+autor: Franco Bertotti - Practical Thinking
+
