@@ -2,8 +2,6 @@
 
 Panel de administración para gestionar el catálogo de productos de Practical Thinking. Permite crear, editar y eliminar productos, categorías, subcategorías y materiales, con autenticación protegida vía Supabase.
 
-**Autor:** Franco Bertotti ([@FrancoBertotti](https://github.com/FrancoBertotti))
-
 ---
 
 ## Stack tecnológico
@@ -160,5 +158,14 @@ Se realizó con Vercel por medio de GithHub, conectado a Supabase para la gestio
 
 link: https://gestor-catalogo.vercel.app/login
 
-autor: Franco Bertotti - Practical Thinking
+---
+
+## Autor
+
+**Franco Bertotti** — Practical Thinking Dev
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-franco--bertotti-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/franco-bertotti/)
+[![Web](https://img.shields.io/badge/Web-practical.com.ar-000000?style=flat-square&logo=firefox)](https://practical.com.ar)
+[![Email](https://img.shields.io/badge/Email-francob1997%40gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:francob1997@gmail.com)
+
 
