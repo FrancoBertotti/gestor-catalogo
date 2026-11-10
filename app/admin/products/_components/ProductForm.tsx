@@ -2,6 +2,7 @@
 
 import { useState, useTransition, ChangeEvent, FormEvent } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { validateProduct, type FieldErrors } from '../validation'
 
 export type Category = {
   id: string
@@ -32,7 +33,7 @@ type ProductFormProps = {
   product?: Product
   categories: Category[]
   subcategories: Subcategory[]
-  onSubmit: (data: any) => Promise<void>
+  onSubmit: (data: any) => Promise<{ error?: string } | void>
 }
 
 export default function ProductForm({
@@ -43,6 +44,8 @@ export default function ProductForm({
 }: ProductFormProps) {
   const [isPending, startTransition] = useTransition()
   const [isUploading, setIsUploading] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [serverError, setServerError] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     title: product?.title || '',
@@ -57,6 +60,17 @@ export default function ProductForm({
   })
 
   const [images, setImages] = useState<string[]>(product?.images || [])
+
+  // Tras el primer intento de envío, los errores se recalculan en vivo.
+  const errors: FieldErrors = submitted ? validateProduct(formData) : {}
+
+  const baseInput =
+    'w-full px-4 py-2 bg-zinc-900 border rounded-lg text-zinc-100 focus:outline-none'
+  const inputClass = (field: keyof FieldErrors) =>
+    `${baseInput} ${errors[field] ? 'border-red-500 focus:border-red-400' : 'border-zinc-800 focus:border-zinc-500'}`
+  const FieldError = ({ field }: { field: keyof FieldErrors }) =>
+    errors[field] ? <p className="text-xs text-red-400 mt-1.5">{errors[field]}</p> : null
+  const Required = () => <span className="text-red-400"> *</span>
 
   const filteredSubcategories = subcategories.filter(
     (sub) => sub.category_id === formData.category_id
@@ -119,23 +133,39 @@ export default function ProductForm({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
+    setSubmitted(true)
+    setServerError(null)
+
+    if (Object.keys(validateProduct(formData)).length > 0) {
+      // Lleva al usuario al primer campo con error
+      setTimeout(() => {
+        document
+          .querySelector('[data-invalid="true"]')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 0)
+      return
+    }
+
     startTransition(async () => {
-      await onSubmit({ ...formData, images })
+      const result = await onSubmit({ ...formData, images })
+      if (result?.error) setServerError(result.error)
     })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+    <form onSubmit={handleSubmit} noValidate className="space-y-6 max-w-4xl">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Título</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Título<Required /></label>
           <input
             type="text"
             required
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+            className={inputClass('title')}
+            data-invalid={errors.title ? 'true' : undefined}
           />
+          <FieldError field="title" />
         </div>
 
         <div className="md:col-span-2">
@@ -149,17 +179,19 @@ export default function ProductForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Categoría</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Categoría<Required /></label>
           <select
             value={formData.category_id}
             onChange={handleCategoryChange}
-            className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+            className={inputClass('category_id')}
+            data-invalid={errors.category_id ? 'true' : undefined}
           >
             <option value="" disabled>Seleccionar categoría</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>{cat.label}</option>
             ))}
           </select>
+          <FieldError field="category_id" />
         </div>
 
         <div>
@@ -178,13 +210,15 @@ export default function ProductForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Precio Mínimo</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Precio Mínimo<Required /></label>
           <input
             type="text"
             value={formData.price_min}
             onChange={(e) => setFormData({ ...formData, price_min: e.target.value })}
-            className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+            className={inputClass('price_min')}
+            data-invalid={errors.price_min ? 'true' : undefined}
           />
+          <FieldError field="price_min" />
         </div>
 
         <div>
@@ -193,18 +227,22 @@ export default function ProductForm({
             type="text"
             value={formData.price_max}
             onChange={(e) => setFormData({ ...formData, price_max: e.target.value })}
-            className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+            className={inputClass('price_max')}
+            data-invalid={errors.price_max ? 'true' : undefined}
           />
+          <FieldError field="price_max" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Tiempo de Entrega</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-2">Tiempo de Entrega<Required /></label>
           <input
             type="text"
             value={formData.lead_time_short}
             onChange={(e) => setFormData({ ...formData, lead_time_short: e.target.value })}
-            className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-100 focus:outline-none focus:border-zinc-500"
+            className={inputClass('lead_time_short')}
+            data-invalid={errors.lead_time_short ? 'true' : undefined}
           />
+          <FieldError field="lead_time_short" />
         </div>
 
         <div>
@@ -220,17 +258,22 @@ export default function ProductForm({
           </select>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <button
             type="button"
+            role="switch"
+            aria-checked={formData.active}
+            aria-label={formData.active ? 'Desactivar producto' : 'Activar producto'}
             onClick={() => setFormData({ ...formData, active: !formData.active })}
-            className={`w-10 h-5 rounded-full transition-colors relative ${formData.active ? 'bg-green-500' : 'bg-zinc-600'}`}
+            className={`relative shrink-0 w-12 h-6 p-0 border-0 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-zinc-400 ${formData.active ? 'bg-green-500' : 'bg-zinc-600'}`}
           >
-            <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${formData.active ? 'translate-x-5' : 'translate-x-0.5'}`} />
+            <span
+              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white shadow-sm transition-transform duration-200 ${formData.active ? 'translate-x-6' : 'translate-x-0'}`}
+            />
           </button>
-          <label className="text-sm font-medium text-zinc-300">
+          <span className="text-sm font-medium text-zinc-300">
             {formData.active ? 'Activo (visible en la web)' : 'Inactivo (oculto en la web)'}
-          </label>
+          </span>
         </div>
 
         <div className="md:col-span-2">
@@ -259,24 +302,25 @@ export default function ProductForm({
                     alt={`Preview ${index}`}
                     className="w-full h-full object-cover"
                   />
-                  {index === 0 && (
-                    <span className="absolute top-2 left-2 bg-zinc-900/90 text-zinc-100 text-xs px-2 py-0.5 rounded font-medium">
-                      Principal
+                  {index === 0 ? (
+                    <span className="absolute bottom-0 inset-x-0 bg-[#dc4a1b] text-white text-xs text-center py-1.5 font-medium">
+                      ★ Principal
                     </span>
-                  )}
-                  {index !== 0 && (
+                  ) : (
                     <button
                       type="button"
                       onClick={() => handleSetMain(url)}
-                      className="absolute top-2 left-2 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs px-2 py-0.5 rounded transition opacity-0 group-hover:opacity-100"
+                      aria-label={`Marcar imagen ${index + 1} como principal`}
+                      className="absolute bottom-0 inset-x-0 bg-zinc-900/90 hover:bg-zinc-800 active:bg-zinc-700 text-zinc-200 text-xs text-center py-2 transition touch-manipulation"
                     >
-                      Principal
+                      Hacer principal
                     </button>
                   )}
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(url)}
-                    className="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1 rounded transition"
+                    aria-label={`Eliminar imagen ${index + 1}`}
+                    className="absolute top-2 right-2 bg-red-600/90 hover:bg-red-600 text-white text-sm px-2.5 py-1.5 transition touch-manipulation"
                   >
                     ✕
                   </button>
@@ -286,6 +330,22 @@ export default function ProductForm({
           )}
         </div>
       </div>
+
+      {serverError && (
+        <p className="text-sm text-red-400 border border-red-500/40 bg-red-500/10 rounded-lg px-4 py-3">
+          {serverError}
+        </p>
+      )}
+
+      {submitted && Object.keys(errors).length > 0 && (
+        <p className="text-sm text-red-400">
+          Revisá los campos marcados en rojo: hay datos obligatorios sin completar.
+        </p>
+      )}
+
+      <p className="text-xs text-zinc-500">
+        Los campos marcados con <span className="text-red-400">*</span> son obligatorios.
+      </p>
 
       <div className="flex justify-end pt-4">
         <button

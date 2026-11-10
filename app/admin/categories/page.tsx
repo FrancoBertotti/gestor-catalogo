@@ -87,7 +87,7 @@ export default async function CategoriesPage() {
       </section>
 
       {/* Subcategorías */}
-      <section className="space-y-4">
+      <section id="subcategorias" className="space-y-4 scroll-mt-6">
         <div className="flex justify-between items-center gap-4">
           <div>
             <h2 className="text-xl font-bold text-white">subcategorías</h2>
