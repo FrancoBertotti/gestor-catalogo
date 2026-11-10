@@ -3,6 +3,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { parsePrice, validateProduct } from './validation'
+
+export type ActionResult = { error?: string }
 
 export type ProductInput = {
   title: string
@@ -24,16 +27,21 @@ async function requireAuth() {
   return supabase
 }
 
-export async function createProduct(data: ProductInput) {
+export async function createProduct(data: ProductInput): Promise<ActionResult> {
   const supabase = await requireAuth()
+
+  const fieldErrors = validateProduct(data)
+  if (Object.keys(fieldErrors).length > 0) {
+    return { error: Object.values(fieldErrors)[0] }
+  }
 
   const { error } = await supabase.from('products').insert([
     {
-      title: data.title,
+      title: data.title.trim(),
       description: data.description,
-      price_min: data.price_min,
-      price_max: data.price_max,
-      lead_time_short: data.lead_time_short,
+      price_min: parsePrice(data.price_min),
+      price_max: parsePrice(data.price_max),
+      lead_time_short: data.lead_time_short.trim(),
       type: data.type,
       category_id: data.category_id,
       subcategory_id: data.subcategory_id || null,
@@ -42,23 +50,28 @@ export async function createProduct(data: ProductInput) {
     },
   ])
 
-  if (error) throw new Error(`Error al crear producto: ${error.message}`)
+  if (error) return { error: `Error al crear producto: ${error.message}` }
 
   revalidatePath('/admin/products')
   redirect('/admin/products')
 }
 
-export async function updateProduct(id: string, data: ProductInput) {
+export async function updateProduct(id: string, data: ProductInput): Promise<ActionResult> {
   const supabase = await requireAuth()
+
+  const fieldErrors = validateProduct(data)
+  if (Object.keys(fieldErrors).length > 0) {
+    return { error: Object.values(fieldErrors)[0] }
+  }
 
   const { error } = await supabase
     .from('products')
     .update({
-      title: data.title,
+      title: data.title.trim(),
       description: data.description,
-      price_min: data.price_min,
-      price_max: data.price_max,
-      lead_time_short: data.lead_time_short,
+      price_min: parsePrice(data.price_min),
+      price_max: parsePrice(data.price_max),
+      lead_time_short: data.lead_time_short.trim(),
       type: data.type,
       category_id: data.category_id,
       subcategory_id: data.subcategory_id || null,
@@ -67,7 +80,7 @@ export async function updateProduct(id: string, data: ProductInput) {
     })
     .eq('id', id)
 
-  if (error) throw new Error(`Error al actualizar producto: ${error.message}`)
+  if (error) return { error: `Error al actualizar producto: ${error.message}` }
 
   revalidatePath('/admin/products')
   redirect('/admin/products')
