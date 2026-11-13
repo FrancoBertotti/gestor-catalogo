@@ -12,7 +12,8 @@ export type ProductFormValues = {
 export type FieldErrors = Partial<Record<keyof ProductFormValues, string>>
 
 /** Convierte "1.234,50" / "12,5" / "12.5" a número. Devuelve null si está vacío o es inválido. */
-export function parsePrice(value: string | null | undefined): number | null {
+export function parsePrice(value: string | number | null | undefined): number | null {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
   const raw = (value ?? '').trim()
   if (raw === '') return null
   const normalized = raw.includes(',')

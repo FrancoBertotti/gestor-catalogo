@@ -50,8 +50,8 @@ export default function ProductForm({
   const [formData, setFormData] = useState({
     title: product?.title || '',
     description: product?.description || '',
-    price_min: product?.price_min || '',
-    price_max: product?.price_max || '',
+    price_min: product?.price_min != null ? String(product.price_min) : '',
+    price_max: product?.price_max != null ? String(product.price_max) : '',
     lead_time_short: product?.lead_time_short || '',
     type: product?.type || 'estandar',
     category_id: product?.category_id || (categories[0]?.id || ''),
